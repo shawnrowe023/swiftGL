@@ -15,6 +15,7 @@ const defaultParameterValues = {
 // GL functions
 //
 
+// Returns true if the browser supports WebGL, false if it does not.
 function isWebGLSupported() {
   try {
     const canvas = document.createElement('canvas');
@@ -26,10 +27,12 @@ function isWebGLSupported() {
   }
 }
 
+// Sets the buffer source of a ShaderSource object.
 function ShaderSource(shaderSource) {
   this.shaderSource = shaderSource;
 }
 
+// Creates a shaderDisplay object.
 function ShaderDisplay(
   canvas,
   screenSizes,
@@ -55,6 +58,7 @@ function ShaderDisplay(
   };
 
   /* Create clean fragmentShadersList */
+  
   var shaderCount = 0;
   const fragmentShadersListClean = [];
 
@@ -126,6 +130,7 @@ function ShaderDisplay(
   }
 }
 
+// Creates and binds a new VertexBuffer object from a ShaderDisplay object.
 function VertexBuffer(shaderDisplay) {
   const gl = shaderDisplay.gl;
 
@@ -136,18 +141,21 @@ function VertexBuffer(shaderDisplay) {
   gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
 }
 
+// Creates a new FragmentBuffer object from a ShaderDisplay object and unique Buffer ID.
 function FragmentBuffer(shaderDisplay, bufferID) {
   const frameBuffer = createFrameBuffer(shaderDisplay, bufferID);
   this.buffer = frameBuffer.frameBuffer;
   this.texture = frameBuffer.texture;
 }
 
+// Creates a new VertexShader object from a ShaderDisplay object and binds it to a unique name.
 function VertexShader(shaderDisplay, vertexShaderName) {
   const gl = shaderDisplay.gl;
   const [success, shader] = createShader(gl, gl.VERTEX_SHADER, shaderDisplay[vertexShaderName].shaderSource);
   this.shader = shader;
 }
 
+// Creates a new FragmentShader object from a ShaderDisplay object and VertexShader object.
 function FragmentShader(shaderDisplay, vertexShader, shaderIndex) {
   const gl = shaderDisplay.gl;
   const fragmentShaders = shaderDisplay.fragmentShaders;
@@ -182,11 +190,13 @@ function FragmentShader(shaderDisplay, vertexShader, shaderIndex) {
   return [true, this];
 }
 
+// Creates a new FrameBuffer object from a buffer source and image source.
 function FrameBuffer(frameBuffer, texture) {
   this.frameBuffer = frameBuffer;
   this.texture = texture;
 }
 
+// Creates a new ShaderLoader object from a VertexBuffer object, an array of buffers, shaders, and loaded images.
 function ShaderLoader(vertexBuffer, buffers, shaders, textures) {
   this.vertexBuffer = vertexBuffer;
   this.buffers = buffers;
@@ -194,16 +204,19 @@ function ShaderLoader(vertexBuffer, buffers, shaders, textures) {
   this.textures = textures;
 }
 
+// Creates a new Define object with a name and assigned definition value.
 function Define(defName, value) {
   this.defName = defName;
   this.value = value;
 }
 
+// Creates a new Spec object with a defined type and meta information for debugging.
 function Spec(type, meta) {
   this.type = type;
   this.meta = meta;
 }
 
+// Processes a WebGL error that was thrown with correct line information.
 function processGLError(errorMessage, extraLines) {
   // Rewrite error information to provide correct line numbers
   return errorMessage.replace(/(\d+):(\d+)/g, (match, line, col) => {
@@ -211,6 +224,7 @@ function processGLError(errorMessage, extraLines) {
   });
 }
 
+// Creates a Shader object from a GL source, GL type, buffer source code, and extra line spacing for error messages.
 function createShader(gl, type, source, extraLines) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -228,6 +242,7 @@ function createShader(gl, type, source, extraLines) {
   return [true, shader];
 }
 
+// Creates a Program object from a GL source, VertexShader object, FragmentShader object, and extra line spacing for error messages.
 function createProgram(gl, vertexShader, fragmentShader, extraLines) {
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
@@ -246,6 +261,7 @@ function createProgram(gl, vertexShader, fragmentShader, extraLines) {
   return program;
 }
 
+// Assigns specification parameter information to a GL source.
 function loadParameters(gl, spec) {
   spec = spec || defaultParameterValues;
 
@@ -253,6 +269,7 @@ function loadParameters(gl, spec) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[spec.filter]);
 }
 
+// Creates a FrameBuffer object from a ShaderDisplay source and unique Buffer ID.
 function createFrameBuffer(shaderDisplay, bufferID) {
   const gl = shaderDisplay.gl;
   const spec = shaderDisplay.specifications.buffers[bufferID];
@@ -280,6 +297,7 @@ function createFrameBuffer(shaderDisplay, bufferID) {
   return new FrameBuffer(frameBuffer, texture);
 }
 
+// Creates a new Texture object from a ShaderDisplay object with a unique texture ID.
 function createTexture(shaderDisplay, textureID) {
   const gl = shaderDisplay.gl;
   const textures = shaderDisplay.textures;
@@ -294,6 +312,7 @@ function createTexture(shaderDisplay, textureID) {
   return texture;
 }
 
+// Initializes and stages a ready WebGL buffer from a finalized shaderDisplay object.
 function loadShaders(shaderDisplay) {
   const fragmentShaders = shaderDisplay.fragmentShaders;
 
@@ -329,6 +348,7 @@ function loadShaders(shaderDisplay) {
   return [true, new ShaderLoader(vertexBuffer, buffers, shaders, textures)];
 }
 
+// Performs the render phase of a shader object.
 function renderStep(shaderArgs) {
   const shaderDisplay = shaderArgs.shaderDisplay
   const shaderLoader = shaderArgs.shaderCompiled;
@@ -396,12 +416,14 @@ function renderStep(shaderArgs) {
 
 /* Render wrapper */
 
+// Renders a single, or multiple, frames with a callback function for extra render handling.
 function renderFrame(loadCallback, isOnePass) {
   return ((timestamp) => {
     return render(loadCallback, isOnePass);
   });
 }
 
+// Initiates the rendering process with a render callback function for extra render handling.
 function render(loadCallback, isOnePass) {
   const shaderLoaded = loadCallback(isOnePass);
 
