@@ -32,17 +32,8 @@ function ShaderSource(shaderSource) {
   this.shaderSource = shaderSource;
 }
 
-// Creates a shaderDisplay object.
-function ShaderDisplay(
-  canvas,
-  screenSizes,
-  declarations,
-  commons,
-  vertexShader,
-  fragmentShadersList,
-  textures,
-  definitions,
-  specifications) {
+// Creates a shaderDisplay object from a Canvas DOMElement, an array of ScreenSizes, an array of Declaration objects, a string of globally-shared commons, and ShaderObject information.
+function ShaderDisplay(canvas, screenSizes, declarations, commons, vertexShader, fragmentShadersList, textures, definitions, specifications) {
   this.canvas = canvas;
   this.gl = canvas.getContext('webgl');
   this.screenSizeXFlat = screenSizes.flat[0];
